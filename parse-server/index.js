@@ -52,7 +52,7 @@ app.get('/test', function(req, res) {
 //Initialize Parse
 Parse.initialize(process.env.APP_ID || 'myAppId');
 Parse.serverURL = process.env.SERVER_URL || 'http://localhost:1337/parse';
-
+Parse.masterKey = process.env.MASTER_KEY ;
 //GraphQL
 app.use(
   '/graphql',

@@ -11,6 +11,15 @@ import {
 } from 'graphql';
 import Parse from 'parse/node';
 
+const isAuthorized = async token => {
+  const q = new Parse.Query(Parse.Session).include("user").equalTo('sessionToken', token);
+  const session = await q.first({ useMasterKey: true });
+  if (typeof session === 'undefined') {
+    throw new Error("Unauthorized" );
+  }
+  return session;
+}
+
 /********* Object Types *********/
 
 const userType = new GraphQLObjectType({
@@ -56,9 +65,9 @@ const postType = new GraphQLObjectType({
 const getPosts = {
   type: new GraphQLList(postType),
   description: 'list of posts',
-  resolve: (value,args,{sessionToken}) => {
-    /* validate sessionToken */
-    /* make query */
+  resolve: async (value,args,{sessionToken}) => {
+    const session = await isAuthorized(sessionToken);
+
     new Parse.Query('Post').find()
   }
 }

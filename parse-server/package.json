@@ -18,7 +18,8 @@
   },
   "babel": {
     "presets": [
-      "es2015"
+      "es2015",
+      "stage-0"
     ]
   },
   "scripts": {
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1"
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1"
   }
 }
