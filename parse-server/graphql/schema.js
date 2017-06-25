@@ -15,7 +15,7 @@ const isAuthorized = async token => {
   const q = new Parse.Query(Parse.Session).include("user").equalTo('sessionToken', token);
   const session = await q.first({ useMasterKey: true });
   if (typeof session === 'undefined') {
-    throw new Error("Unauthorized" );
+    throw new Error("Unauthorized");
   }
   return session;
 }
@@ -65,10 +65,10 @@ const postType = new GraphQLObjectType({
 const getPosts = {
   type: new GraphQLList(postType),
   description: 'list of posts',
-  resolve: async (value,args,{sessionToken}) => {
+  resolve: async (value, args, { sessionToken }) => {
     const session = await isAuthorized(sessionToken);
-
-    new Parse.Query('Post').find()
+    var Post = Parse.Object.extend("Post");
+    return new Parse.Query(Post).include('author').find({ sessionToken });
   }
 }
 
@@ -124,12 +124,33 @@ const login = {
   }
 }
 
+const createPost = {
+  type: postType,
+  description: 'add new post',
+  args: {
+    message: {
+      type: GraphQLString,
+    },
+  },
+  resolve: async (value, { message },{sessionToken}) => {
+    const session = await isAuthorized(sessionToken);
+    var Post = Parse.Object.extend("Post");
+    var post = new Post();
+    post.set("message", message);
+    post.set("author", session.get('user'));
+    post.setACL(new Parse.ACL(session.get('user')));
+    return post.save();
+  }
+}
+
+
 var mutationTypes = new GraphQLObjectType({
   name: "mutation",
   description: "All mutation",
   fields: () => ({
     signUp,
     login,
+    createPost
   })
 });
 
@@ -137,6 +158,6 @@ var mutationTypes = new GraphQLObjectType({
 
 
 export default new GraphQLSchema({
-  query:queryTypes,
+  query: queryTypes,
   mutation: mutationTypes,
 });
