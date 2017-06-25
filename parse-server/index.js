@@ -60,7 +60,8 @@ app.use(
     return {
       graphiql: true,
       pretty: true,
-      schema: schema
+      schema: schema,
+      context:{sessionToken:request.headers["x-parse-session-token"]},
     };
   })
 );
